@@ -38,4 +38,14 @@ macOS, the flake gives the agents without a jail.
 - `claude-code`: the unjailed Claude Code package. The default comes from `llm-agents.nix`.
 - `opencode`: the unjailed opencode package. The default comes from `llm-agents.nix`.
 
+## Notes
+
+Set `ZK_NOTEBOOK_DIR` to the root of a [zk](https://github.com/zk-org/zk) notebook before you start an agent. The jail
+then binds the notebook read-write, forwards the variable, and binds `~/.config/zk` read-only. The `zk` command is on
+the `PATH` of both agents. When `ZK_NOTEBOOK_DIR` is not set, the jail binds no notebook. A missing directory stops the
+jail.
+
+Tell the agent about the notebook in your own `~/.claude/CLAUDE.md` or `~/.config/opencode/AGENTS.md`, because the jail
+gives the agent only the variable.
+
 Without a flake of your own, run `nix run github:GetThru/agent-jail#claude-code`.

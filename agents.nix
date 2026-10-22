@@ -35,6 +35,8 @@ let
     diffutils
     neovim
     ncurses
+    # The notes of notes.sh can hold a zk notebook.
+    zk
   ];
 
   baseJailOptions = with c; [
@@ -72,6 +74,13 @@ let
     (add-pkg-deps [ pkgs.glibcLocales ])
     (add-pkg-deps basePkgs)
     (add-pkg-deps extraPkgs)
+    # zk reads the notebook from ZK_NOTEBOOK_DIR. When the variable is set,
+    # bind the notebook read-write, so the agent can manage the notes with zk.
+    # The wrapper expands the raw args at launch, as `try-fwd-env` does. An
+    # unset variable adds no bind, and a missing directory stops bwrap.
+    (unsafe-add-raw-args "\${ZK_NOTEBOOK_DIR:+--bind \"$ZK_NOTEBOOK_DIR\" \"$ZK_NOTEBOOK_DIR\"}")
+    (try-fwd-env "ZK_NOTEBOOK_DIR")
+    (try-readonly (noescape "~/.config/zk"))
   ];
 
   # jail.nix's `readwrite` fails on a missing path, so the wrapper creates the
