@@ -35,7 +35,7 @@ let
     diffutils
     neovim
     ncurses
-    # The notes of notes.sh can hold a zk notebook.
+    # The agent manages the notebook of ZK_NOTEBOOK_DIR with zk.
     zk
   ];
 
@@ -81,6 +81,19 @@ let
     (unsafe-add-raw-args "\${ZK_NOTEBOOK_DIR:+--bind \"$ZK_NOTEBOOK_DIR\" \"$ZK_NOTEBOOK_DIR\"}")
     (try-fwd-env "ZK_NOTEBOOK_DIR")
     (try-readonly (noescape "~/.config/zk"))
+    # home-manager links each file of ~/.config/zk to a store path outside the
+    # closure of the jail, so each link dangles in the jail. Bind the end of
+    # each link chain at the first target, so the link resolves.
+    (add-runtime ''
+      if [ -d "$HOME/.config/zk" ]; then
+        while IFS= read -r -d "" link; do
+          target=$(readlink "$link")
+          case "$target" in
+            /nix/store/*) RUNTIME_ARGS+=(--ro-bind-try "$(readlink -f "$link")" "$target") ;;
+          esac
+        done < <(${pkgs.findutils}/bin/find "$HOME/.config/zk" -type l -print0)
+      fi
+    '')
   ];
 
   # jail.nix's `readwrite` fails on a missing path, so the wrapper creates the

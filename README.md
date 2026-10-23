@@ -41,8 +41,9 @@ macOS, the flake gives the agents without a jail.
 ## Notes
 
 Set `ZK_NOTEBOOK_DIR` to the root of a [zk](https://github.com/zk-org/zk) notebook before you start an agent. The jail
-then binds the notebook read-write, forwards the variable, and binds `~/.config/zk` read-only. The `zk` command is on
-the `PATH` of both agents. When `ZK_NOTEBOOK_DIR` is not set, the jail binds no notebook. A missing directory stops the
+then binds the notebook read-write, forwards the variable, and binds `~/.config/zk` read-only. When `~/.config/zk` holds
+a link to the Nix store, as home-manager writes, the jail binds the target of the link. The `zk` command is on the
+`PATH` of both agents. When `ZK_NOTEBOOK_DIR` is not set, the jail binds no notebook. A missing directory stops the
 jail.
 
 Tell the agent about the notebook in your own `~/.claude/CLAUDE.md` or `~/.config/opencode/AGENTS.md`, because the jail
